@@ -22,6 +22,7 @@ public:
 	void UpdateCell(Snake* snake);
 	void SpawnPrey();
 	Point& GetPreyPoint();
+	Point& GetPrevPreyPoint();
 	void SpawnX2();
 
 	int GetWidth() { return width; }
@@ -33,6 +34,7 @@ protected:
 	int borderSize;
 
 	Point preyPos;
+	Point prevPreyPos;
 
 	inline bool IsEmptyCell(int x, int y);
 

@@ -13,13 +13,14 @@
 #include <string>
 #include <ctime>
 
-#include "GameMap.h"
+
 #include "GameEnum.h"
-#include "Input.h"
 #include "Point.h"
 #include "Cell.h"
 
 using namespace std;
 
+class GameMap;
+class Input;
 extern unique_ptr<GameMap> gMap;
 extern unique_ptr<Input> gInput;

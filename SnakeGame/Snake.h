@@ -8,7 +8,7 @@ public:
 
 	void Update(long elapsedTime);
 	void Move();
-	void FindPath();
+	bool FindPath();
 
 	void ChangeDirection(Direction dir);
 	void ClearPath() { snakePath.clear(); }

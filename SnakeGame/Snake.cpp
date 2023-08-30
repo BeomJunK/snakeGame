@@ -1,6 +1,6 @@
 #include "GamePch.h"
 #include "Snake.h"
-
+#include "GameMap.h"
 
 #define Head GetHeadPoint()
 #define Tail GetTailPoint()
@@ -10,8 +10,8 @@ Snake::Snake()
 	int w = gMap->GetWidth();
 	int h = gMap->GetHeight();
 
-	moveSec = 1;
-	lastMoveTime = 0;
+	moveSec = 250;
+	lastMoveTime = -moveSec - 1;
 	inputDir = moveDir = Direction::RIGHT;
 
 	snakeList.push_back(new Point(w / 2, h / 2 , 0,0));
@@ -33,13 +33,32 @@ void Snake::Update(long elapsedTime)
 
 void Snake::Move()
 {
-	gMap->UpdateCell(this);
-
+	if (gMap->GetPrevPreyPoint() == *Head)
+	{
+		snakePath.clear();
+	}
+	
 	if (snakePath.empty())
-		FindPath();
+	{
+		if (FindPath() == false)
+		{
+			//경로를 찾을수 없을떈 빈칸아무떄나 이동
+			for (int i = 0; i < 4; i++)
+			{
+				Point next = *Head + direction[i];
 
+				if (CanGo(next) == false)
+					continue;
+
+				Head->Set(next.x, next.y);
+				FollowTail();
+				snakePath.clear();
+				gMap->UpdateCell(this);
+				return;
+			}
+		}
+	}
 	int dir = static_cast<int>(moveDir);
-
 	pathIndex++;
 
 	//for AI
@@ -57,8 +76,9 @@ void Snake::Move()
 	}
 
 	Head->Set(Head->x + direction[dir].x, Head->y + direction[dir].y);
-
 	FollowTail();
+
+	gMap->UpdateCell(this);
 
 }
 
@@ -103,7 +123,7 @@ void Snake::FollowTail()
 	}
 }
 
-void Snake::FindPath()
+bool Snake::FindPath()
 {
 	Point startPos = *Head;
 	int w = gMap->GetWidth();
@@ -121,6 +141,8 @@ void Snake::FindPath()
 
 	Point preyPos = gMap->GetPreyPoint();
 	Point _visit;
+
+	bool _findPath = false;
 	while (pq.empty() == false)
 	{
 		Point next = pq.top().second;
@@ -153,12 +175,17 @@ void Snake::FindPath()
 
 			//도착지라면 중단
 			if (_visit == preyPos)
+			{
+				_findPath = true;
 				break;
+			}
 		}
 	}
-	
-	Point pos = preyPos;
 	snakePath.clear();
+	if (_findPath == false)
+		return false;
+
+	Point pos = preyPos;
 	pathIndex = 0;
 	while (true)
 	{
@@ -171,6 +198,7 @@ void Snake::FindPath()
 	}
 
 	::reverse(snakePath.begin(), snakePath.end());
+	return true;
 }
 
 bool Snake::CanGo(Point& p)

@@ -1,5 +1,6 @@
 #pragma once
 #include "GamePch.h"
+#include "GameMap.h"
 
 class GameManager
 {

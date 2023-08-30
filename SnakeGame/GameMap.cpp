@@ -2,6 +2,7 @@
 #include "Cell.h"
 #include "GameManager.h"
 #include "Snake.h"
+#include "GameMap.h"
 
 GameMap::GameMap(int width, int height, int borderSize)
 {
@@ -111,16 +112,9 @@ void GameMap::UpdateCell(Snake* snake)
 	Clear();
 	GameManager& mgr = GameManager::getInstance();
 
-	auto snakeList = snake->GetSnake();
-	list<Point*>::iterator it = snakeList.begin();
+	
 
-	//꼬리 이동 Update
-	++it;
-	for (; it != snakeList.end(); ++it)
-	{
-		gameMap[(*it)->y][(*it)->x]->SetCellType(CellType::Snake);
-	}
-
+	
 	//머리부분 이동된 이벤트 처리
 	Point* head = snake->GetHeadPoint();
 	switch (gameMap[head->y][head->x]->GetCellType())
@@ -133,12 +127,9 @@ void GameMap::UpdateCell(Snake* snake)
 			mgr.AddCurrentGameScore(mgr.GetPrevScore());
 
 			const long MIN_MOVE_SEC = 1;
-			long newMoveSec = snake->GetMoveSec() - 2;
+			long newMoveSec = snake->GetMoveSec() - 20;
 			long moveSec = clamp(newMoveSec, MIN_MOVE_SEC, snake->GetMoveSec());
 			snake->SetMoveSec(moveSec);
-
-			//먹었으면 경로 다시 찾기
-			snake->ClearPath();
 
 			//일정확률 먹이 2배
 			//SpawnX2();
@@ -158,6 +149,15 @@ void GameMap::UpdateCell(Snake* snake)
 	}
 	//머리 이동 Update
 	gameMap[head->y][head->x]->SetCellType(CellType::Snake);
+	auto snakeList = snake->GetSnake();
+	list<Point*>::iterator it = snakeList.begin();
+	//꼬리 이동 Update
+	++it;
+	for (; it != snakeList.end(); ++it)
+	{
+		gameMap[(*it)->y][(*it)->x]->SetCellType(CellType::Snake);
+	}
+
 
 	//Prey Schedul..
 	//!!!스케줄링을 하지않고 그냥 스폰하게되면 머리부분과 먹이가 겹치게 스폰될시 Snake로 바꿔버린다.
@@ -199,6 +199,7 @@ void GameMap::SpawnPrey()
 
 	gameMap[randomY][randomX]->SetCellType(CellType::Prey);
 
+	prevPreyPos = preyPos;
 	preyPos.x = randomX;
 	preyPos.y = randomY;
 }
@@ -206,6 +207,11 @@ void GameMap::SpawnPrey()
 Point& GameMap::GetPreyPoint()
 {
 	return preyPos;
+}
+
+Point& GameMap::GetPrevPreyPoint()
+{
+	return prevPreyPos;
 }
 
 void GameMap::SpawnX2()

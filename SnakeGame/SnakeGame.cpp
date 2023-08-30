@@ -1,7 +1,8 @@
 ﻿#include "GamePch.h"
 #include "Snake.h"
 #include "GameManager.h"
-
+#include "GameMap.h"
+#include "Input.h"
 
 void ClearScreen();
 void Initalize();

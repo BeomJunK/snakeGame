@@ -1,5 +1,5 @@
 #include "GamePch.h"
-
+#include "GameMap.h"
 
 Point::Point()
 {

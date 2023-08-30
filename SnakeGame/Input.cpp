@@ -1,4 +1,6 @@
 #include "GamePch.h"
+#include "Input.h"
+
 void Input::Update()
 {
 	for (const auto& pair : states)
